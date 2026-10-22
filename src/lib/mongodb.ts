@@ -33,19 +33,19 @@ export async function connectToDatabase(): Promise<typeof mongoose | null> {
     const opts: mongoose.ConnectOptions = {
       bufferCommands: false,
       maxPoolSize: 10,
-      serverSelectionTimeoutMS: 8000,
+      serverSelectionTimeoutMS: 3500, // Fail fast on serverless if Atlas IP is blocked
+      connectTimeoutMS: 3500,
     };
 
     cached.promise = mongoose
       .connect(uri, opts)
       .then((mongooseInstance) => {
-        console.log("Connected to MongoDB Atlas successfully!");
         return mongooseInstance;
       })
       .catch((err) => {
-        console.error("MongoDB Atlas connection error:", err.message);
+        console.warn("MongoDB Atlas connection warning:", err.message);
         cached.promise = null;
-        throw err;
+        return null as any;
       });
   }
 
