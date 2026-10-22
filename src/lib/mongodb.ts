@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const DEFAULT_MONGODB_URI =
+  "mongodb+srv://fitness_tracker:aR9xOqWD48JjLLQe@sajjadjim15.ac97xgz.mongodb.net/fitness_tracker?retryWrites=true&w=majority";
 
 interface MongooseCache {
   conn: typeof mongoose | null;
@@ -18,12 +19,13 @@ if (!global.mongooseCache) {
 }
 
 export async function connectToDatabase(): Promise<typeof mongoose | null> {
-  if (!MONGODB_URI) {
-    // Allows demo / preview mode without crashing if MONGODB_URI is not set yet
+  const uri = process.env.MONGODB_URI || DEFAULT_MONGODB_URI;
+
+  if (!uri) {
     return null;
   }
 
-  if (cached.conn) {
+  if (cached.conn && mongoose.connection.readyState === 1) {
     return cached.conn;
   }
 
@@ -31,12 +33,20 @@ export async function connectToDatabase(): Promise<typeof mongoose | null> {
     const opts: mongoose.ConnectOptions = {
       bufferCommands: false,
       maxPoolSize: 10,
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 8000,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongooseInstance) => {
-      return mongooseInstance;
-    });
+    cached.promise = mongoose
+      .connect(uri, opts)
+      .then((mongooseInstance) => {
+        console.log("Connected to MongoDB Atlas successfully!");
+        return mongooseInstance;
+      })
+      .catch((err) => {
+        console.error("MongoDB Atlas connection error:", err.message);
+        cached.promise = null;
+        throw err;
+      });
   }
 
   try {
@@ -44,6 +54,6 @@ export async function connectToDatabase(): Promise<typeof mongoose | null> {
     return cached.conn;
   } catch (e) {
     cached.promise = null;
-    throw e;
+    return null;
   }
 }

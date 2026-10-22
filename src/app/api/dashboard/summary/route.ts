@@ -25,27 +25,34 @@ export async function GET() {
     const preferredUnit = auth.user.preferredUnit || "kg";
     const heightCm = auth.user.heightCm || 175;
 
-    await connectToDatabase();
-
     let entries: any[] = [];
     let goal: any = null;
 
-    if (mongoose.connection.readyState === 1) {
-      // Fetch sorted weight entries
-      entries = await WeightEntry.find({ userId: auth.user._id })
-        .sort({ recordedAt: -1 })
-        .exec();
+    try {
+      await connectToDatabase();
 
-      // Fetch active goal
-      goal = await FitnessGoal.findOne({
-        userId: auth.user._id,
-        status: "active",
-      }).sort({ createdAt: -1 });
-    } else {
+      if (mongoose.connection.readyState === 1) {
+        entries = await WeightEntry.find({ userId: auth.user._id })
+          .sort({ recordedAt: -1 })
+          .exec();
+
+        goal = await FitnessGoal.findOne({
+          userId: auth.user._id,
+          status: "active",
+        }).sort({ createdAt: -1 });
+      }
+    } catch (dbErr) {
+      console.warn("MongoDB query warning, using fallback cache:", dbErr);
+    }
+
+    // If no entries in DB and in demo mode, use demo sample entries
+    if (entries.length === 0 && auth.isDemoUser) {
       entries = getFallbackWeights(String(auth.user._id)).sort(
         (a, b) => new Date(b.recordedAt).getTime() - new Date(a.recordedAt).getTime()
       );
-      goal = getFallbackGoal(String(auth.user._id));
+      if (!goal) {
+        goal = getFallbackGoal(String(auth.user._id));
+      }
     }
 
     // Calculations

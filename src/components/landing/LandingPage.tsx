@@ -13,14 +13,19 @@ import {
   Moon,
   Sun,
   Lock,
+  LogIn,
 } from "lucide-react";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useTheme } from "@/components/providers/ThemeProvider";
+import { AuthModal } from "@/components/auth/AuthModal";
 import { calculateBmi, getBmiCategory, getHealthyWeightRange, BMI_HEALTH_DISCLAIMER } from "@/lib/calculations";
 
 export function LandingPage() {
-  const { signInWithGoogle, loginAsDemo, loading } = useAuth();
+  const { loginAsDemo, loading } = useAuth();
   const { theme, toggleTheme } = useTheme();
+
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState<"signin" | "signup">("signin");
 
   // Interactive Live Preview State on Landing Page
   const [previewHeight, setPreviewHeight] = useState<number>(175);
@@ -29,6 +34,11 @@ export function LandingPage() {
   const previewBmi = calculateBmi(previewWeight, previewHeight);
   const previewCategory = getBmiCategory(previewBmi);
   const healthyRange = getHealthyWeightRange(previewHeight);
+
+  const openAuth = (mode: "signin" | "signup") => {
+    setAuthModalMode(mode);
+    setIsAuthModalOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#090d16] text-slate-900 dark:text-slate-100 transition-colors selection:bg-emerald-500 selection:text-white">
@@ -44,7 +54,7 @@ export function LandingPage() {
             </span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={toggleTheme}
               className="p-2 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
@@ -56,15 +66,26 @@ export function LandingPage() {
             <button
               onClick={() => loginAsDemo()}
               disabled={loading}
-              className="px-3.5 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors hidden sm:block"
+              className="px-3 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors hidden md:block"
             >
-              Try Instant Demo
+              Guest Demo
             </button>
 
+            {/* Email / Password Sign In trigger */}
             <button
-              onClick={() => signInWithGoogle()}
+              onClick={() => openAuth("signin")}
               disabled={loading}
-              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+            >
+              <LogIn className="w-3.5 h-3.5" />
+              <span>Sign In</span>
+            </button>
+
+            {/* Google / Account Sign Up CTA */}
+            <button
+              onClick={() => openAuth("signup")}
+              disabled={loading}
+              className="flex items-center gap-2 px-3.5 sm:px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path
@@ -84,7 +105,7 @@ export function LandingPage() {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
                 />
               </svg>
-              <span>Sign in with Google</span>
+              <span>Get Started</span>
             </button>
           </div>
         </div>
@@ -92,13 +113,11 @@ export function LandingPage() {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden pt-12 pb-20 sm:pt-20 sm:pb-28">
-        {/* Ambient Glow Orbs */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute top-1/3 left-1/3 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-3xl mx-auto">
-            {/* Pro badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold mb-6 animate-in fade-in slide-in-from-bottom-2">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Full-Stack Next.js • Firebase Auth • MongoDB Atlas</span>
@@ -116,11 +135,11 @@ export function LandingPage() {
 
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
               <button
-                onClick={() => signInWithGoogle()}
+                onClick={() => openAuth("signin")}
                 disabled={loading}
                 className="w-full sm:w-auto px-7 py-3.5 bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold rounded-2xl shadow-xl shadow-emerald-600/25 flex items-center justify-center gap-2.5 transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
-                <span>Get Started with Google</span>
+                <span>Sign In / Create Account</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
@@ -255,7 +274,6 @@ export function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Feature 1 */}
             <div className="p-7 rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 hover:border-emerald-500/40 transition-all">
               <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center mb-5">
                 <BarChart3 className="w-6 h-6" />
@@ -269,7 +287,6 @@ export function LandingPage() {
               </p>
             </div>
 
-            {/* Feature 2 */}
             <div className="p-7 rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 hover:border-emerald-500/40 transition-all">
               <div className="w-12 h-12 rounded-2xl bg-teal-500/10 text-teal-500 flex items-center justify-center mb-5">
                 <TrendingDown className="w-6 h-6" />
@@ -283,7 +300,6 @@ export function LandingPage() {
               </p>
             </div>
 
-            {/* Feature 3 */}
             <div className="p-7 rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 hover:border-emerald-500/40 transition-all">
               <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 text-cyan-500 flex items-center justify-center mb-5">
                 <Download className="w-6 h-6" />
@@ -313,6 +329,13 @@ export function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Firebase Authentication Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        defaultMode={authModalMode}
+      />
     </div>
   );
 }

@@ -3,6 +3,10 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import {
   signInWithPopup,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+  updateProfile,
   signOut as firebaseSignOut,
   onAuthStateChanged,
   User as FirebaseUser,
@@ -22,6 +26,9 @@ interface AuthContextType {
   loading: boolean;
   isFirebaseConfigured: boolean;
   signInWithGoogle: () => Promise<void>;
+  signInWithEmail: (email: string, password: string) => Promise<void>;
+  signUpWithEmail: (email: string, password: string, displayName?: string) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
   loginAsDemo: () => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -31,6 +38,9 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   isFirebaseConfigured: false,
   signInWithGoogle: async () => {},
+  signInWithEmail: async () => {},
+  signUpWithEmail: async () => {},
+  resetPassword: async () => {},
   loginAsDemo: async () => {},
   logout: async () => {},
 });
@@ -110,7 +120,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(true);
     try {
       if (!isFirebaseConfigured || !auth || !googleProvider) {
-        // Fallback to demo mode if Firebase credentials are missing in env
         await loginAsDemo();
         return;
       }
@@ -127,12 +136,79 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isDemo: false,
       });
       localStorage.removeItem("fittrack_demo_active");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Google sign-in error:", error);
       throw error;
     } finally {
       setLoading(false);
     }
+  };
+
+  const signInWithEmail = async (email: string, password: string) => {
+    setLoading(true);
+    try {
+      if (!isFirebaseConfigured || !auth) {
+        await loginAsDemo();
+        return;
+      }
+
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      const token = await cred.user.getIdToken();
+      await syncSession(token, false);
+
+      setUser({
+        uid: cred.user.uid,
+        email: cred.user.email,
+        displayName: cred.user.displayName,
+        photoURL: cred.user.photoURL,
+        isDemo: false,
+      });
+      localStorage.removeItem("fittrack_demo_active");
+    } catch (error: any) {
+      console.error("Email sign-in error:", error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signUpWithEmail = async (email: string, password: string, displayName?: string) => {
+    setLoading(true);
+    try {
+      if (!isFirebaseConfigured || !auth) {
+        await loginAsDemo();
+        return;
+      }
+
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      if (displayName && cred.user) {
+        await updateProfile(cred.user, { displayName });
+      }
+
+      const token = await cred.user.getIdToken();
+      await syncSession(token, false);
+
+      setUser({
+        uid: cred.user.uid,
+        email: cred.user.email,
+        displayName: displayName || cred.user.displayName,
+        photoURL: cred.user.photoURL,
+        isDemo: false,
+      });
+      localStorage.removeItem("fittrack_demo_active");
+    } catch (error: any) {
+      console.error("Sign-up error:", error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resetPassword = async (email: string) => {
+    if (!isFirebaseConfigured || !auth) {
+      throw new Error("Firebase Authentication is not configured.");
+    }
+    await sendPasswordResetEmail(auth, email);
   };
 
   const loginAsDemo = async () => {
@@ -176,6 +252,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loading,
         isFirebaseConfigured,
         signInWithGoogle,
+        signInWithEmail,
+        signUpWithEmail,
+        resetPassword,
         loginAsDemo,
         logout,
       }}

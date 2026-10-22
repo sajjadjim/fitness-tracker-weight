@@ -95,12 +95,23 @@ export function DashboardView() {
         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm">
           {(error as Error)?.message || "An unexpected error occurred while fetching your records."}
         </p>
-        <button
-          onClick={() => refetch()}
-          className="mt-4 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold shadow-md flex items-center gap-1.5"
-        >
-          <RefreshCw className="w-3.5 h-3.5" /> Try Again
-        </button>
+        <div className="flex items-center gap-3 mt-4">
+          <button
+            onClick={() => refetch()}
+            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold shadow-md flex items-center gap-1.5 transition-all"
+          >
+            <RefreshCw className="w-3.5 h-3.5" /> Try Again
+          </button>
+          <button
+            onClick={() => {
+              localStorage.removeItem("fittrack_demo_active");
+              window.location.reload();
+            }}
+            className="px-4 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-semibold transition-all"
+          >
+            Reset Session
+          </button>
+        </div>
       </div>
     );
   }
