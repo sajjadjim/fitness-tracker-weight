@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useToast } from "@/components/ui/Toast";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -27,6 +28,7 @@ interface AuthModalProps {
 export function AuthModal({ isOpen, onClose, defaultMode = "signin" }: AuthModalProps) {
   const { signInWithGoogle, signInWithEmail, signUpWithEmail, resetPassword, loginAsDemo } = useAuth();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const [mode, setMode] = useState<"signin" | "signup" | "forgot">(defaultMode);
   const [email, setEmail] = useState("");
@@ -143,17 +145,17 @@ export function AuthModal({ isOpen, onClose, defaultMode = "signin" }: AuthModal
           </div>
           <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             {mode === "signin"
-              ? "Welcome to FitTrack"
+              ? t("welcomeTitle")
               : mode === "signup"
-              ? "Create Your Account"
-              : "Reset Password"}
+              ? t("createAccount")
+              : t("resetPassword")}
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             {mode === "signin"
-              ? "Sign in to access your telemetry, BMI progress & records"
+              ? t("signInToAccount")
               : mode === "signup"
-              ? "Start tracking your daily weight and body composition goals"
-              : "Enter your registered email to receive a password reset link"}
+              ? t("signUpSubtitle")
+              : t("forgotSubtitle")}
           </p>
         </div>
 
@@ -183,14 +185,14 @@ export function AuthModal({ isOpen, onClose, defaultMode = "signin" }: AuthModal
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
                 />
               </svg>
-              <span>Continue with Google</span>
+              <span>{t("continueWithGoogle")}</span>
             </button>
 
             {/* Divider */}
             <div className="relative flex items-center justify-center my-4">
               <div className="border-t border-slate-200 dark:border-slate-800 w-full" />
               <span className="bg-white dark:bg-slate-900 px-3 text-[11px] font-semibold text-slate-400 uppercase tracking-wider relative">
-                or with email
+                {t("orWithEmail")}
               </span>
             </div>
           </div>
@@ -220,7 +222,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = "signin" }: AuthModal
           {mode === "signup" && (
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                <User className="w-3.5 h-3.5 text-emerald-500" /> Full Name
+                <User className="w-3.5 h-3.5 text-emerald-500" /> {t("fullName")}
               </label>
               <input
                 type="text"
@@ -235,7 +237,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = "signin" }: AuthModal
 
           <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1 flex items-center gap-1.5">
-              <Mail className="w-3.5 h-3.5 text-emerald-500" /> Email Address
+              <Mail className="w-3.5 h-3.5 text-emerald-500" /> {t("emailAddress")}
             </label>
             <input
               type="email"
@@ -251,7 +253,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = "signin" }: AuthModal
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <Lock className="w-3.5 h-3.5 text-emerald-500" /> Password
+                  <Lock className="w-3.5 h-3.5 text-emerald-500" /> {t("password")}
                 </label>
                 {mode === "signin" && (
                   <button
@@ -262,7 +264,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = "signin" }: AuthModal
                     }}
                     className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline"
                   >
-                    Forgot password?
+                    {t("forgotPassword")}
                   </button>
                 )}
               </div>
@@ -294,20 +296,20 @@ export function AuthModal({ isOpen, onClose, defaultMode = "signin" }: AuthModal
           >
             {submitting ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" /> Processing...
+                <Loader2 className="w-4 h-4 animate-spin" /> {t("processing")}
               </>
             ) : mode === "signin" ? (
               <>
-                <span>Sign In</span> <ArrowRight className="w-4 h-4" />
+                <span>{t("signIn")}</span> <ArrowRight className="w-4 h-4" />
               </>
             ) : mode === "signup" ? (
               <>
-                <span>Create FitTrack Account</span> <ArrowRight className="w-4 h-4" />
+                <span>{t("createFitTrackAccount")}</span> <ArrowRight className="w-4 h-4" />
               </>
             ) : (
               <>
                 <KeyRound className="w-4 h-4" />
-                <span>Send Reset Link</span>
+                <span>{t("sendResetLink")}</span>
               </>
             )}
           </button>
@@ -317,7 +319,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = "signin" }: AuthModal
         <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800/80 text-center text-xs text-slate-500 dark:text-slate-400">
           {mode === "signin" ? (
             <p>
-              Don&apos;t have an account yet?{" "}
+              {t("dontHaveAccount")}{" "}
               <button
                 type="button"
                 onClick={() => {
@@ -326,12 +328,12 @@ export function AuthModal({ isOpen, onClose, defaultMode = "signin" }: AuthModal
                 }}
                 className="font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
               >
-                Sign up free
+                {t("signUpFree")}
               </button>
             </p>
           ) : mode === "signup" ? (
             <p>
-              Already have an account?{" "}
+              {t("alreadyHaveAccount")}{" "}
               <button
                 type="button"
                 onClick={() => {
@@ -340,12 +342,12 @@ export function AuthModal({ isOpen, onClose, defaultMode = "signin" }: AuthModal
                 }}
                 className="font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
               >
-                Sign in
+                {t("signIn")}
               </button>
             </p>
           ) : (
             <p>
-              Remember your password?{" "}
+              {t("rememberPassword")}{" "}
               <button
                 type="button"
                 onClick={() => {
@@ -354,7 +356,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = "signin" }: AuthModal
                 }}
                 className="font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
               >
-                Back to sign in
+                {t("backToSignIn")}
               </button>
             </p>
           )}
@@ -366,7 +368,7 @@ export function AuthModal({ isOpen, onClose, defaultMode = "signin" }: AuthModal
               onClick={handleDemoSignIn}
               className="text-[11px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 underline"
             >
-              Or explore with temporary guest preview mode
+              {t("guestPreviewExplore")}
             </button>
           </div>
         </div>

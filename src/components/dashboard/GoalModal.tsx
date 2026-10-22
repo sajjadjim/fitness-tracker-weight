@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { X, Target, TrendingDown, TrendingUp, ShieldCheck, Loader2 } from "lucide-react";
 import { WeightUnit, lbsToKg, kgToLbs } from "@/lib/calculations";
 import { useToast } from "@/components/ui/Toast";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 interface GoalModalProps {
   isOpen: boolean;
@@ -28,6 +29,7 @@ export function GoalModal({
   existingGoal,
 }: GoalModalProps) {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [goalType, setGoalType] = useState<"lose" | "gain" | "maintain">("lose");
   const [startingWeightInput, setStartingWeightInput] = useState<string>("");
   const [targetWeightInput, setTargetWeightInput] = useState<string>("");
@@ -121,10 +123,10 @@ export function GoalModal({
             </div>
             <div>
               <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-                Customize Fitness Goal
+                {t("customizeGoal")}
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Choose your focus and target milestone
+                {t("chooseFocus")}
               </p>
             </div>
           </div>
@@ -140,7 +142,7 @@ export function GoalModal({
           {/* Goal Type Selector */}
           <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
-              Goal Focus
+              {t("goalFocus")}
             </label>
             <div className="grid grid-cols-3 gap-2">
               <button
@@ -153,7 +155,7 @@ export function GoalModal({
                 }`}
               >
                 <TrendingDown className="w-4 h-4 text-emerald-500" />
-                <span>Weight Loss</span>
+                <span>{t("weightLoss")}</span>
               </button>
 
               <button
@@ -166,7 +168,7 @@ export function GoalModal({
                 }`}
               >
                 <TrendingUp className="w-4 h-4 text-teal-500" />
-                <span>Muscle Gain</span>
+                <span>{t("muscleGain")}</span>
               </button>
 
               <button
@@ -179,7 +181,7 @@ export function GoalModal({
                 }`}
               >
                 <ShieldCheck className="w-4 h-4 text-sky-500" />
-                <span>Maintain</span>
+                <span>{t("maintain")}</span>
               </button>
             </div>
           </div>
@@ -187,7 +189,7 @@ export function GoalModal({
           {/* Starting Weight */}
           <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-              Starting Weight ({preferredUnit.toUpperCase()})
+              {t("startingWeight")} ({preferredUnit.toUpperCase()})
             </label>
             <input
               type="number"
@@ -202,7 +204,7 @@ export function GoalModal({
           {/* Target Weight */}
           <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-              Target Weight ({preferredUnit.toUpperCase()})
+              {t("targetWeight")} ({preferredUnit.toUpperCase()})
             </label>
             <input
               type="number"
@@ -222,7 +224,7 @@ export function GoalModal({
               disabled={submitting}
               className="flex-1 py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-700 font-semibold text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="submit"
@@ -231,10 +233,10 @@ export function GoalModal({
             >
               {submitting ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" /> Saving...
+                  <Loader2 className="w-4 h-4 animate-spin" /> {t("saving")}
                 </>
               ) : (
-                "Save Goal"
+                t("saveGoal")
               )}
             </button>
           </div>

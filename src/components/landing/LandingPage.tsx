@@ -17,12 +17,15 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useTheme } from "@/components/providers/ThemeProvider";
+import { useLanguage } from "@/components/providers/LanguageProvider";
+import { LanguageToggle } from "@/components/ui/LanguageToggle";
 import { AuthModal } from "@/components/auth/AuthModal";
-import { calculateBmi, getBmiCategory, getHealthyWeightRange, BMI_HEALTH_DISCLAIMER } from "@/lib/calculations";
+import { calculateBmi, getBmiCategory, getHealthyWeightRange } from "@/lib/calculations";
 
 export function LandingPage() {
   const { loginAsDemo, loading } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { t, formatNum } = useLanguage();
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<"signin" | "signup">("signin");
@@ -40,6 +43,21 @@ export function LandingPage() {
     setIsAuthModalOpen(true);
   };
 
+  const getCategoryLabel = (category: string) => {
+    switch (category) {
+      case "Underweight":
+        return t("underweight");
+      case "Normal weight":
+        return t("normalWeight");
+      case "Overweight":
+        return t("overweight");
+      case "Obesity":
+        return t("obesity");
+      default:
+        return category;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#090d16] text-slate-900 dark:text-slate-100 transition-colors selection:bg-emerald-500 selection:text-white">
       {/* Top Navbar */}
@@ -50,11 +68,15 @@ export function LandingPage() {
               <Activity className="w-5 h-5" />
             </div>
             <span className="font-extrabold text-xl tracking-tight text-slate-900 dark:text-white">
-              FitTrack
+              {t("brand")}
             </span>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Language Toggle */}
+            <LanguageToggle variant="pill" />
+
+            {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
               className="p-2 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
@@ -68,7 +90,7 @@ export function LandingPage() {
               disabled={loading}
               className="px-3 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors hidden md:block"
             >
-              Guest Demo
+              {t("guestDemo")}
             </button>
 
             {/* Email / Password Sign In trigger */}
@@ -78,7 +100,7 @@ export function LandingPage() {
               className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
             >
               <LogIn className="w-3.5 h-3.5" />
-              <span>Sign In</span>
+              <span>{t("signIn")}</span>
             </button>
 
             {/* Google / Account Sign Up CTA */}
@@ -105,7 +127,7 @@ export function LandingPage() {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
                 />
               </svg>
-              <span>Get Started</span>
+              <span>{t("getStarted")}</span>
             </button>
           </div>
         </div>
@@ -120,17 +142,16 @@ export function LandingPage() {
           <div className="text-center max-w-3xl mx-auto">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold mb-6 animate-in fade-in slide-in-from-bottom-2">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Full-Stack Next.js • Firebase Auth • MongoDB Atlas</span>
+              <span>{t("heroBadge")}</span>
             </div>
 
             <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.15]">
-              Master Your Body Composition with{" "}
-              <span className="text-gradient-emerald">Precision Tracking</span>
+              {t("heroTitlePrefix")}{" "}
+              <span className="text-gradient-emerald">{t("heroTitleGradient")}</span>
             </h1>
 
             <p className="mt-6 text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
-              Track daily weigh-ins with multiple daily records, monitor authoritative WHO BMI
-              categories, calibrate target weight milestones, and visualize trends with interactive charts.
+              {t("heroDescription")}
             </p>
 
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
@@ -139,7 +160,7 @@ export function LandingPage() {
                 disabled={loading}
                 className="w-full sm:w-auto px-7 py-3.5 bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold rounded-2xl shadow-xl shadow-emerald-600/25 flex items-center justify-center gap-2.5 transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
-                <span>Sign In / Create Account</span>
+                <span>{t("signInOrCreateAccount")}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
@@ -148,21 +169,21 @@ export function LandingPage() {
                 disabled={loading}
                 className="w-full sm:w-auto px-7 py-3.5 bg-white dark:bg-slate-900/80 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 font-bold rounded-2xl shadow-sm transition-all"
               >
-                Explore Live Demo Mode
+                {t("exploreDemo")}
               </button>
             </div>
 
             <div className="mt-4 flex items-center justify-center gap-4 text-xs text-slate-400">
               <span className="flex items-center gap-1">
-                <CheckCircle className="w-3.5 h-3.5 text-emerald-500" /> Free forever
+                <CheckCircle className="w-3.5 h-3.5 text-emerald-500" /> {t("freeForever")}
               </span>
               <span>•</span>
               <span className="flex items-center gap-1">
-                <Lock className="w-3.5 h-3.5 text-teal-500" /> Secure personal data isolation
+                <Lock className="w-3.5 h-3.5 text-teal-500" /> {t("dataIsolation")}
               </span>
               <span>•</span>
               <span className="flex items-center gap-1">
-                <Scale className="w-3.5 h-3.5 text-emerald-500" /> Automatic KG & LBS
+                <Scale className="w-3.5 h-3.5 text-emerald-500" /> {t("autoKgLbs")}
               </span>
             </div>
           </div>
@@ -176,17 +197,17 @@ export function LandingPage() {
                 </div>
                 <div>
                   <h3 className="font-bold text-slate-900 dark:text-white text-base">
-                    Interactive Live BMI Gauge
+                    {t("interactiveGaugeTitle")}
                   </h3>
                   <p className="text-xs text-slate-400">
-                    Adjust the sliders below to test instantaneous calculation
+                    {t("interactiveGaugeDesc")}
                   </p>
                 </div>
               </div>
               <span
                 className={`text-xs px-3 py-1 rounded-full font-bold border ${previewCategory.badgeClass}`}
               >
-                {previewCategory.category}
+                {getCategoryLabel(previewCategory.category)}
               </span>
             </div>
 
@@ -194,9 +215,9 @@ export function LandingPage() {
               {/* Height slider */}
               <div>
                 <div className="flex justify-between text-xs font-bold mb-1.5">
-                  <span className="text-slate-600 dark:text-slate-300">Height:</span>
+                  <span className="text-slate-600 dark:text-slate-300">{t("height")}:</span>
                   <span className="text-emerald-600 dark:text-emerald-400 font-extrabold">
-                    {previewHeight} cm ({(previewHeight / 30.48).toFixed(1)} ft)
+                    {formatNum(previewHeight)} cm ({formatNum((previewHeight / 30.48).toFixed(1))} ft)
                   </span>
                 </div>
                 <input
@@ -212,9 +233,9 @@ export function LandingPage() {
               {/* Weight slider */}
               <div>
                 <div className="flex justify-between text-xs font-bold mb-1.5">
-                  <span className="text-slate-600 dark:text-slate-300">Weight:</span>
+                  <span className="text-slate-600 dark:text-slate-300">{t("weight")}:</span>
                   <span className="text-emerald-600 dark:text-emerald-400 font-extrabold">
-                    {previewWeight} kg ({(previewWeight * 2.20462).toFixed(1)} lbs)
+                    {formatNum(previewWeight)} kg ({formatNum((previewWeight * 2.20462).toFixed(1))} lbs)
                   </span>
                 </div>
                 <input
@@ -232,11 +253,11 @@ export function LandingPage() {
             <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div>
                 <div className="text-[11px] uppercase tracking-wider font-bold text-slate-400">
-                  Calculated BMI
+                  {t("calculatedBmi")}
                 </div>
                 <div className="flex items-baseline gap-2 mt-0.5">
                   <span className="text-3xl font-extrabold text-slate-900 dark:text-white">
-                    {previewBmi?.toFixed(1)}
+                    {formatNum(previewBmi?.toFixed(1))}
                   </span>
                   <span className="text-xs text-slate-500">kg/m²</span>
                 </div>
@@ -245,17 +266,17 @@ export function LandingPage() {
               {healthyRange && (
                 <div className="text-right">
                   <div className="text-[11px] uppercase tracking-wider font-bold text-slate-400">
-                    Normal Reference Range
+                    {t("normalRefRange")}
                   </div>
                   <div className="text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
-                    {healthyRange.minKg} – {healthyRange.maxKg} kg ({healthyRange.minLbs} – {healthyRange.maxLbs} lbs)
+                    {formatNum(healthyRange.minKg)} – {formatNum(healthyRange.maxKg)} kg ({formatNum(healthyRange.minLbs)} – {formatNum(healthyRange.maxLbs)} lbs)
                   </div>
                 </div>
               )}
             </div>
 
             <div className="mt-4 text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed text-center">
-              {BMI_HEALTH_DISCLAIMER}
+              {t("bmiDisclaimer")}
             </div>
           </div>
         </div>
@@ -266,10 +287,10 @@ export function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <h2 className="text-xs font-bold uppercase tracking-widest text-emerald-500 mb-2">
-              Engineered For Results
+              {t("engineeredTitle")}
             </h2>
             <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white">
-              Every Tool You Need To Reach Your Target
+              {t("engineeredSubtitle")}
             </h3>
           </div>
 
@@ -279,11 +300,10 @@ export function LandingPage() {
                 <BarChart3 className="w-6 h-6" />
               </div>
               <h4 className="font-bold text-slate-900 dark:text-white text-lg">
-                Multi-Span Interactive Charts
+                {t("feature1Title")}
               </h4>
               <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                Filter across 7-day, 30-day, 90-day, and 1-year time windows. Track smoothing trends and
-                target goal milestone lines effortlessly.
+                {t("feature1Desc")}
               </p>
             </div>
 
@@ -292,11 +312,10 @@ export function LandingPage() {
                 <TrendingDown className="w-6 h-6" />
               </div>
               <h4 className="font-bold text-slate-900 dark:text-white text-lg">
-                Adaptive Fitness Goals
+                {t("feature2Title")}
               </h4>
               <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                Whether cutting, bulking, or maintaining, FitTrack recalculates remaining milestones and
-                displays animated progress bars after every entry.
+                {t("feature2Desc")}
               </p>
             </div>
 
@@ -305,11 +324,10 @@ export function LandingPage() {
                 <Download className="w-6 h-6" />
               </div>
               <h4 className="font-bold text-slate-900 dark:text-white text-lg">
-                Complete Export & Privacy
+                {t("feature3Title")}
               </h4>
               <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                Export your full measurement history to CSV at any time. Your personal health records
-                are strictly isolated and protected on MongoDB Atlas.
+                {t("feature3Desc")}
               </p>
             </div>
           </div>
@@ -321,11 +339,11 @@ export function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Activity className="w-4 h-4 text-emerald-500" />
-            <span className="font-bold text-slate-800 dark:text-slate-200">FitTrack</span>
-            <span>— Smart Weight & BMI Tracker</span>
+            <span className="font-bold text-slate-800 dark:text-slate-200">{t("brand")}</span>
+            <span>{t("footerTagline")}</span>
           </div>
           <div>
-            Built with Next.js, Firebase Authentication & MongoDB Atlas
+            {t("footerBuilt")}
           </div>
         </div>
       </footer>

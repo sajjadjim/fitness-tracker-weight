@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Sparkles, ArrowRight, Scale, Ruler, Target, CheckCircle2, Loader2 } from "lucide-react";
 import { WeightUnit, lbsToKg } from "@/lib/calculations";
 import { useToast } from "@/components/ui/Toast";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 interface OnboardingModalProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ export function OnboardingModal({
   userName,
 }: OnboardingModalProps) {
   const { toast } = useToast();
+  const { t, formatNum } = useLanguage();
   const [step, setStep] = useState<number>(1);
   const [unit, setUnit] = useState<WeightUnit>("kg");
   const [heightCm, setHeightCm] = useState<number>(175);
@@ -99,10 +101,10 @@ export function OnboardingModal({
           </div>
           <div>
             <h2 className="text-xl font-extrabold text-slate-900 dark:text-white">
-              Welcome to FitTrack
+              {t("onboardingTitle")}
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Let&apos;s personalize your BMI and fitness goals in 3 quick steps
+              {t("onboardingSubtitle")}
             </p>
           </div>
         </div>
@@ -124,7 +126,7 @@ export function OnboardingModal({
           <div className="space-y-5 animate-in fade-in duration-200">
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
-                Preferred Weight Unit
+                {t("defaultUnit")}
               </label>
               <div className="grid grid-cols-2 gap-3">
                 <button
@@ -136,7 +138,7 @@ export function OnboardingModal({
                       : "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
                   }`}
                 >
-                  Kilograms (KG)
+                  {t("kilograms")}
                 </button>
                 <button
                   type="button"
@@ -147,7 +149,7 @@ export function OnboardingModal({
                       : "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
                   }`}
                 >
-                  Pounds (LBS)
+                  {t("pounds")}
                 </button>
               </div>
             </div>
@@ -155,10 +157,10 @@ export function OnboardingModal({
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <Ruler className="w-4 h-4 text-emerald-500" /> Height (cm)
+                  <Ruler className="w-4 h-4 text-emerald-500" /> {t("height")} (cm)
                 </label>
                 <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
-                  {heightCm} cm ({(heightCm / 30.48).toFixed(1)} ft)
+                  {formatNum(heightCm)} cm ({formatNum((heightCm / 30.48).toFixed(1))} ft)
                 </span>
               </div>
               <input
@@ -170,9 +172,9 @@ export function OnboardingModal({
                 className="w-full accent-emerald-500 h-2 bg-slate-200 dark:bg-slate-700 rounded-lg cursor-pointer"
               />
               <div className="flex justify-between text-[10px] text-slate-400 mt-1">
-                <span>120 cm (3.9 ft)</span>
-                <span>Standard adult height</span>
-                <span>230 cm (7.5 ft)</span>
+                <span>{formatNum(120)} cm ({formatNum(3.9)} ft)</span>
+                <span>{t("whoStandard")}</span>
+                <span>{formatNum(230)} cm ({formatNum(7.5)} ft)</span>
               </div>
             </div>
 
@@ -180,7 +182,7 @@ export function OnboardingModal({
               onClick={() => setStep(2)}
               className="w-full mt-4 py-3.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 transition-all"
             >
-              Continue <ArrowRight className="w-4 h-4" />
+              {t("next")} <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         )}
@@ -190,7 +192,7 @@ export function OnboardingModal({
           <div className="space-y-5 animate-in fade-in duration-200">
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <Scale className="w-4 h-4 text-emerald-500" /> Current Baseline Weight ({unit.toUpperCase()})
+                <Scale className="w-4 h-4 text-emerald-500" /> {t("startingWeight")} ({unit.toUpperCase()})
               </label>
               <div className="relative">
                 <input
@@ -207,7 +209,7 @@ export function OnboardingModal({
                 </span>
               </div>
               <p className="text-xs text-slate-400 mt-2">
-                This will be stored as your day 1 starting measurement.
+                {t("sinceBaseline")}
               </p>
             </div>
 
@@ -217,14 +219,14 @@ export function OnboardingModal({
                 onClick={() => setStep(1)}
                 className="flex-1 py-3 px-4 rounded-2xl border border-slate-200 dark:border-slate-700 font-semibold text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
               >
-                Back
+                {t("back")}
               </button>
               <button
                 type="button"
                 onClick={() => setStep(3)}
                 className="flex-1 py-3 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2"
               >
-                Next Step <ArrowRight className="w-4 h-4" />
+                {t("next")} <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -235,13 +237,13 @@ export function OnboardingModal({
           <div className="space-y-5 animate-in fade-in duration-200">
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <Target className="w-4 h-4 text-emerald-500" /> Select Fitness Target
+                <Target className="w-4 h-4 text-emerald-500" /> {t("goalFocus")}
               </label>
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  { type: "lose", label: "Lose Weight" },
-                  { type: "gain", label: "Gain Muscle" },
-                  { type: "maintain", label: "Maintain" },
+                  { type: "lose", label: t("weightLoss") },
+                  { type: "gain", label: t("muscleGain") },
+                  { type: "maintain", label: t("maintain") },
                 ].map((item) => (
                   <button
                     key={item.type}
@@ -261,7 +263,7 @@ export function OnboardingModal({
 
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
-                Target Goal Weight ({unit.toUpperCase()})
+                {t("targetWeight")} ({unit.toUpperCase()})
               </label>
               <div className="relative">
                 <input
@@ -286,7 +288,7 @@ export function OnboardingModal({
                 disabled={submitting}
                 className="flex-1 py-3 px-4 rounded-2xl border border-slate-200 dark:border-slate-700 font-semibold text-sm text-slate-700 dark:text-slate-300"
               >
-                Back
+                {t("back")}
               </button>
               <button
                 type="button"
@@ -296,11 +298,11 @@ export function OnboardingModal({
               >
                 {submitting ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" /> Finalizing...
+                    <Loader2 className="w-4 h-4 animate-spin" /> {t("saving")}
                   </>
                 ) : (
                   <>
-                    <CheckCircle2 className="w-4 h-4" /> Start Tracking
+                    <CheckCircle2 className="w-4 h-4" /> {t("finishSetup")}
                   </>
                 )}
               </button>
