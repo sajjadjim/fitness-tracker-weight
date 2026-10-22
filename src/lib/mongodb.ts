@@ -52,7 +52,7 @@ export async function connectToDatabase(): Promise<typeof mongoose | null> {
   try {
     cached.conn = await cached.promise;
     return cached.conn;
-  } catch (e) {
+  } catch {
     cached.promise = null;
     return null;
   }
