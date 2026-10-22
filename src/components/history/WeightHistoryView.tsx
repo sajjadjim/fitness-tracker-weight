@@ -14,6 +14,7 @@ import {
 import { WeightUnit } from "@/lib/calculations";
 import { formatDateTime } from "@/lib/utils";
 import { useToast } from "@/components/ui/Toast";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 interface WeightHistoryViewProps {
   entries: Array<{
@@ -37,6 +38,8 @@ export function WeightHistoryView({
   onOpenAddModal,
 }: WeightHistoryViewProps) {
   const { toast } = useToast();
+  const { t, formatNum } = useLanguage();
+
   const [searchTerm, setSearchTerm] = useState("");
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -85,10 +88,10 @@ export function WeightHistoryView({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h3 className="font-semibold text-slate-900 dark:text-slate-100 text-lg">
-            Measurement History
+            {t("measurementHistory")}
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            {entries.length} total recorded entries • Complete data isolation
+            {formatNum(entries.length)} {t("totalRecordedEntries")}
           </p>
         </div>
 
@@ -98,7 +101,7 @@ export function WeightHistoryView({
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search history..."
+              placeholder={t("searchHistory")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-9 pr-3.5 py-2 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 w-44 sm:w-56"
@@ -113,7 +116,7 @@ export function WeightHistoryView({
             title="Download CSV of all recorded measurements"
           >
             <Download className="w-3.5 h-3.5 text-emerald-500" />
-            <span>Export CSV</span>
+            <span>{t("exportCsv")}</span>
           </button>
 
           {/* Add Weight button */}
@@ -122,7 +125,7 @@ export function WeightHistoryView({
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md shadow-emerald-600/20 transition-all"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>Add Weight</span>
+            <span>{t("addWeight")}</span>
           </button>
         </div>
       </div>
@@ -132,10 +135,10 @@ export function WeightHistoryView({
         <div className="py-12 flex flex-col items-center justify-center text-center border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
           <Calendar className="w-10 h-10 text-slate-400 mb-2" />
           <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-            No weight entries match your criteria
+            {t("noHistoryMatch")}
           </p>
           <p className="text-xs text-slate-400 mt-1">
-            Log your daily weight or try adjusting your search filters.
+            {t("noHistoryDesc")}
           </p>
         </div>
       ) : (
@@ -143,17 +146,20 @@ export function WeightHistoryView({
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-600 dark:text-slate-400 uppercase tracking-wider font-bold border-b border-slate-100 dark:border-slate-800">
               <tr>
-                <th className="py-3 px-4">Date & Time</th>
-                <th className="py-3 px-4">Weight ({preferredUnit.toUpperCase()})</th>
-                <th className="py-3 px-4">Alternate</th>
-                <th className="py-3 px-4">Notes</th>
-                <th className="py-3 px-4 text-right">Actions</th>
+                <th className="py-3 px-4">{t("dateTime")}</th>
+                <th className="py-3 px-4">{t("currentWeight")} ({preferredUnit.toUpperCase()})</th>
+                <th className="py-3 px-4">{t("alternate")}</th>
+                <th className="py-3 px-4">{t("notes")}</th>
+                <th className="py-3 px-4 text-right">{t("actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-slate-700 dark:text-slate-300">
               {filteredEntries.map((e) => {
                 const primaryVal = preferredUnit === "lbs" ? e.weightLbs : e.weightKg;
-                const altVal = preferredUnit === "lbs" ? `${e.weightKg} kg` : `${e.weightLbs} lbs`;
+                const altVal =
+                  preferredUnit === "lbs"
+                    ? `${formatNum(e.weightKg)} kg`
+                    : `${formatNum(e.weightLbs)} lbs`;
 
                 return (
                   <tr
@@ -164,14 +170,14 @@ export function WeightHistoryView({
                       {formatDateTime(e.recordedAt)}
                     </td>
                     <td className="py-3.5 px-4 font-bold text-slate-900 dark:text-white text-sm">
-                      {primaryVal}{" "}
+                      {formatNum(primaryVal)}{" "}
                       <span className="text-[11px] font-normal text-slate-400">
                         {preferredUnit}
                       </span>
                     </td>
                     <td className="py-3.5 px-4 text-slate-400 whitespace-nowrap">{altVal}</td>
                     <td className="py-3.5 px-4 text-slate-500 dark:text-slate-400 max-w-xs truncate">
-                      {e.note || <span className="text-slate-300 dark:text-slate-600 italic">None</span>}
+                      {e.note || <span className="text-slate-300 dark:text-slate-600 italic">{t("noneNote")}</span>}
                     </td>
                     <td className="py-3.5 px-4 text-right">
                       <div className="flex items-center justify-end gap-1">
@@ -207,10 +213,10 @@ export function WeightHistoryView({
               <AlertTriangle className="w-6 h-6" />
             </div>
             <h4 className="text-base font-bold text-slate-900 dark:text-white">
-              Delete Weight Measurement?
+              {t("deleteConfirmTitle")}
             </h4>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-              This action cannot be undone. All dashboard calculations and charts will update immediately.
+              {t("deleteConfirmDesc")}
             </p>
             <div className="flex gap-2.5 mt-5">
               <button
@@ -218,14 +224,14 @@ export function WeightHistoryView({
                 disabled={isDeleting}
                 className="flex-1 py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
               >
-                Cancel
+                {t("cancel")}
               </button>
               <button
                 onClick={() => handleDelete(deleteTargetId)}
                 disabled={isDeleting}
                 className="flex-1 py-2 px-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-md shadow-rose-600/20"
               >
-                {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Delete"}
+                {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : t("delete")}
               </button>
             </div>
           </div>

@@ -13,6 +13,8 @@ import {
 import { WeightUnit } from "@/lib/calculations";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { useLanguage } from "@/components/providers/LanguageProvider";
+import { LanguageToggle } from "@/components/ui/LanguageToggle";
 
 interface DashboardHeaderProps {
   user: {
@@ -35,6 +37,7 @@ export function DashboardHeader({
 }: DashboardHeaderProps) {
   const { theme, toggleTheme } = useTheme();
   const { logout } = useAuth();
+  const { t } = useLanguage();
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md transition-colors">
@@ -47,25 +50,28 @@ export function DashboardHeader({
           <div>
             <div className="flex items-center gap-2">
               <span className="font-extrabold text-slate-900 dark:text-white tracking-tight text-lg">
-                FitTrack
+                {t("brand")}
               </span>
               <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hidden sm:inline-block">
-                Pro
+                {t("pro")}
               </span>
               {user.isDemoUser && (
                 <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                  Demo Mode
+                  {t("demoMode")}
                 </span>
               )}
             </div>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
-              Smart Weight & BMI Tracking
+              {t("smartTracker")}
             </p>
           </div>
         </div>
 
         {/* Actions & Profile */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          {/* Language Toggle (English | বাংলা) */}
+          <LanguageToggle />
+
           {/* Quick Unit Switcher */}
           <button
             onClick={onToggleUnit}
@@ -95,14 +101,14 @@ export function DashboardHeader({
             className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white text-xs font-bold shadow-md shadow-emerald-600/20 transition-all"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>Log Weight</span>
+            <span>{t("logWeight")}</span>
           </button>
 
           {/* Settings Trigger */}
           <button
             onClick={onOpenSettingsModal}
             className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-            title="Profile & Settings"
+            title={t("settings")}
           >
             <Settings className="w-4 h-4" />
           </button>
@@ -124,7 +130,7 @@ export function DashboardHeader({
             <button
               onClick={() => logout()}
               className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors"
-              title="Sign Out"
+              title={t("signOut")}
             >
               <LogOut className="w-4 h-4" />
             </button>

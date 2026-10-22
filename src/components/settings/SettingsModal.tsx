@@ -12,10 +12,13 @@ import {
   AlertTriangle,
   Loader2,
   Check,
+  Languages,
 } from "lucide-react";
 import { WeightUnit } from "@/lib/calculations";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { useLanguage } from "@/components/providers/LanguageProvider";
+import { LanguageToggle } from "@/components/ui/LanguageToggle";
 import { useToast } from "@/components/ui/Toast";
 
 interface SettingsModalProps {
@@ -41,6 +44,7 @@ export function SettingsModal({
   const { theme, toggleTheme } = useTheme();
   const { logout } = useAuth();
   const { toast } = useToast();
+  const { t, formatNum } = useLanguage();
 
   const [name, setName] = useState(user.name || "");
   const [heightCm, setHeightCm] = useState(user.heightCm || 175);
@@ -116,7 +120,7 @@ export function SettingsModal({
             </div>
             <div>
               <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-                Profile & Settings
+                {t("profileAndSettings")}
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">{user.email}</p>
             </div>
@@ -130,10 +134,21 @@ export function SettingsModal({
         </div>
 
         <form onSubmit={handleSave} className="mt-5 space-y-4">
+          {/* Language Selector */}
+          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Languages className="w-4 h-4 text-emerald-500" />
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                {t("language")}
+              </span>
+            </div>
+            <LanguageToggle variant="select" />
+          </div>
+
           {/* Name Field */}
           <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-              Display Name
+              {t("displayName")}
             </label>
             <input
               type="text"
@@ -148,10 +163,10 @@ export function SettingsModal({
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                <Ruler className="w-3.5 h-3.5 text-emerald-500" /> Height (cm)
+                <Ruler className="w-3.5 h-3.5 text-emerald-500" /> {t("height")} (cm)
               </label>
               <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                {heightCm} cm ({(heightCm / 30.48).toFixed(1)} ft)
+                {formatNum(heightCm)} cm ({formatNum((heightCm / 30.48).toFixed(1))} ft)
               </span>
             </div>
             <input
@@ -167,7 +182,7 @@ export function SettingsModal({
           {/* Preferred Unit */}
           <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-              <Scale className="w-3.5 h-3.5 text-emerald-500" /> Default Measurement Unit
+              <Scale className="w-3.5 h-3.5 text-emerald-500" /> {t("defaultUnit")}
             </label>
             <div className="grid grid-cols-2 gap-2">
               <button
@@ -179,7 +194,7 @@ export function SettingsModal({
                     : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
                 }`}
               >
-                Kilograms (KG)
+                {t("kilograms")}
               </button>
               <button
                 type="button"
@@ -190,7 +205,7 @@ export function SettingsModal({
                     : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
                 }`}
               >
-                Pounds (LBS)
+                {t("pounds")}
               </button>
             </div>
           </div>
@@ -204,7 +219,7 @@ export function SettingsModal({
                 <Sun className="w-4 h-4 text-amber-500" />
               )}
               <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                Interface Theme
+                {t("interfaceTheme")}
               </span>
             </div>
             <button
@@ -212,7 +227,7 @@ export function SettingsModal({
               onClick={toggleTheme}
               className="px-3 py-1.5 bg-white dark:bg-slate-700 rounded-lg text-xs font-semibold border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 shadow-sm hover:border-emerald-500 transition-colors"
             >
-              {theme === "dark" ? "Dark Theme" : "Light Theme"} (Click to Switch)
+              {theme === "dark" ? t("darkTheme") : t("lightTheme")} ({t("clickToSwitch")})
             </button>
           </div>
 
@@ -225,7 +240,7 @@ export function SettingsModal({
                 className="text-xs text-rose-500 hover:text-rose-600 font-semibold flex items-center gap-1.5 transition-colors"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                <span>Delete Account and All History</span>
+                <span>{t("deleteAccountOption")}</span>
               </button>
             ) : (
               <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/20 border border-rose-300/60 dark:border-rose-900/40 text-xs">
@@ -241,7 +256,7 @@ export function SettingsModal({
                     onClick={() => setShowDeleteConfirm(false)}
                     className="px-2.5 py-1 rounded-md border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400"
                   >
-                    Cancel
+                    {t("cancel")}
                   </button>
                   <button
                     type="button"
@@ -264,7 +279,7 @@ export function SettingsModal({
               disabled={submitting}
               className="flex-1 py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-700 font-semibold text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="submit"
@@ -273,11 +288,11 @@ export function SettingsModal({
             >
               {submitting ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" /> Saving...
+                  <Loader2 className="w-4 h-4 animate-spin" /> {t("saving")}
                 </>
               ) : (
                 <>
-                  <Check className="w-4 h-4" /> Save Changes
+                  <Check className="w-4 h-4" /> {t("saveChanges")}
                 </>
               )}
             </button>

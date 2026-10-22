@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { X, Scale, Calendar, FileText, Sparkles, Loader2 } from "lucide-react";
 import { WeightUnit, lbsToKg, kgToLbs, calculateBmi, getBmiCategory } from "@/lib/calculations";
 import { useToast } from "@/components/ui/Toast";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 interface AddWeightModalProps {
   isOpen: boolean;
@@ -28,6 +29,7 @@ export function AddWeightModal({
   initialEntry,
 }: AddWeightModalProps) {
   const { toast } = useToast();
+  const { t, formatNum, locale } = useLanguage();
   const [weightInput, setWeightInput] = useState<string>("");
   const [recordedAt, setRecordedAt] = useState<string>("");
   const [note, setNote] = useState<string>("");
@@ -46,7 +48,6 @@ export function AddWeightModal({
     } else {
       setWeightInput("");
       const now = new Date();
-      // Format local datetime for datetime-local input
       const tzOffset = now.getTimezoneOffset() * 60000;
       const localISOTime = new Date(now.getTime() - tzOffset).toISOString().slice(0, 16);
       setRecordedAt(localISOTime);
@@ -67,10 +68,22 @@ export function AddWeightModal({
   const liveBmi = normalizedKg ? calculateBmi(normalizedKg, userHeightCm) : null;
   const liveBmiCategory = getBmiCategory(liveBmi);
 
+  const localizedCategory = () => {
+    const cat = liveBmiCategory.category.toLowerCase();
+    if (cat.includes("under")) return t("underweight");
+    if (cat.includes("normal")) return t("normalWeight");
+    if (cat.includes("over")) return t("overweight");
+    return t("obesity");
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!normalizedKg || normalizedKg < 15 || normalizedKg > 450) {
-      toast.error("Please enter a valid weight between 15 kg and 450 kg (33 - 990 lbs)");
+      toast.error(
+        locale === "bn"
+          ? "অনুগ্রহ করে ১৫ থেকে ৪৫০ কেজির মধ্যে একটি বৈধ ওজন লিখুন।"
+          : "Please enter a valid weight between 15 kg and 450 kg (33 - 990 lbs)"
+      );
       return;
     }
 
@@ -95,7 +108,9 @@ export function AddWeightModal({
       }
 
       toast.success(
-        initialEntry ? "Weight measurement updated" : "Weight entry recorded successfully!"
+        initialEntry
+          ? locale === "bn" ? "ওজন রেকর্ড সফলভাবে আপডেট করা হয়েছে" : "Weight measurement updated"
+          : locale === "bn" ? "নতুন ওজন সফলভাবে যোগ করা হয়েছে!" : "Weight entry recorded successfully!"
       );
       onSuccess();
       onClose();
@@ -119,10 +134,10 @@ export function AddWeightModal({
             </div>
             <div>
               <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-                {initialEntry ? "Edit Weight Entry" : "Log Daily Weight"}
+                {initialEntry ? t("editWeightEntry") : t("logDailyWeight")}
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Supports multiple daily entries & auto-updates BMI
+                {t("modalSubtitleWeight")}
               </p>
             </div>
           </div>
@@ -138,7 +153,7 @@ export function AddWeightModal({
           {/* Weight Input Field */}
           <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-              Weight ({preferredUnit.toUpperCase()})
+              {t("currentWeight")} ({preferredUnit.toUpperCase()})
             </label>
             <div className="relative">
               <input
@@ -164,16 +179,16 @@ export function AddWeightModal({
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-emerald-500" />
                 <span className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                  Calculated BMI:
+                  {t("calculatedBmi")}:
                 </span>
                 <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
-                  {liveBmi.toFixed(1)}
+                  {formatNum(liveBmi.toFixed(1))}
                 </span>
               </div>
               <span
                 className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${liveBmiCategory.badgeClass}`}
               >
-                {liveBmiCategory.category}
+                {localizedCategory()}
               </span>
             </div>
           )}
@@ -181,7 +196,7 @@ export function AddWeightModal({
           {/* Date & Time Picker */}
           <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5 text-slate-400" /> Date & Time
+              <Calendar className="w-3.5 h-3.5 text-slate-400" /> {t("dateTime")}
             </label>
             <input
               type="datetime-local"
@@ -195,14 +210,14 @@ export function AddWeightModal({
           {/* Optional Note */}
           <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-              <FileText className="w-3.5 h-3.5 text-slate-400" /> Note (Optional)
+              <FileText className="w-3.5 h-3.5 text-slate-400" /> {t("noteOptional")}
             </label>
             <input
               type="text"
               maxLength={250}
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              placeholder="e.g. Fasted morning check, post-leg-day..."
+              placeholder={locale === "bn" ? "যেমন: সকালের খালি পেটে, ওয়ার্কআউটের পরে..." : "e.g. Fasted morning check, post-leg-day..."}
               className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
@@ -215,7 +230,7 @@ export function AddWeightModal({
               disabled={submitting}
               className="flex-1 py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-700 font-semibold text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="submit"
@@ -224,12 +239,12 @@ export function AddWeightModal({
             >
               {submitting ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" /> Saving...
+                  <Loader2 className="w-4 h-4 animate-spin" /> {t("saving")}
                 </>
               ) : initialEntry ? (
-                "Update Entry"
+                t("updateEntry")
               ) : (
-                "Save Entry"
+                t("saveEntry")
               )}
             </button>
           </div>

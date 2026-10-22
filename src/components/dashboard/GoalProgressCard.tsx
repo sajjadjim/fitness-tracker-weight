@@ -3,6 +3,7 @@
 import React from "react";
 import { Target, Flag, TrendingDown, TrendingUp, CheckCircle, Edit3 } from "lucide-react";
 import { WeightUnit } from "@/lib/calculations";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 interface GoalProgressCardProps {
   goal: {
@@ -30,21 +31,23 @@ export function GoalProgressCard({
   preferredUnit,
   onEditGoal,
 }: GoalProgressCardProps) {
+  const { t, formatNum, locale } = useLanguage();
+
   if (!goal) {
     return (
       <div className="rounded-2xl border border-dashed border-slate-300 dark:border-slate-800 bg-white/50 dark:bg-slate-900/40 p-6 flex flex-col items-center justify-center text-center">
         <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 mb-3">
           <Target className="w-6 h-6" />
         </div>
-        <h3 className="font-semibold text-slate-800 dark:text-slate-200">No Goal Set Yet</h3>
+        <h3 className="font-semibold text-slate-800 dark:text-slate-200">{t("noGoalSet")}</h3>
         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-xs">
-          Set your starting and target weight to unlock real-time progress tracking.
+          {t("noGoalDesc")}
         </p>
         <button
           onClick={onEditGoal}
           className="mt-4 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold shadow-md transition-all"
         >
-          Set Fitness Goal
+          {t("setFitnessGoal")}
         </button>
       </div>
     );
@@ -52,17 +55,26 @@ export function GoalProgressCard({
 
   const startingVal = preferredUnit === "lbs" ? goal.startingWeightLbs : goal.startingWeightKg;
   const targetVal = preferredUnit === "lbs" ? goal.targetWeightLbs : goal.targetWeightKg;
-  const currentVal =
+  const rawCurrent =
     currentWeightKg !== null
       ? preferredUnit === "lbs"
         ? (currentWeightKg * 2.20462).toFixed(1)
         : currentWeightKg.toFixed(1)
       : "--";
+  const currentVal = formatNum(rawCurrent);
 
   const goalTypeLabels = {
-    lose: "Weight Loss Goal",
-    gain: "Muscle / Weight Gain Goal",
-    maintain: "Weight Maintenance Goal",
+    lose: t("weightLossGoal"),
+    gain: t("muscleGainGoal"),
+    maintain: t("maintainGoal"),
+  };
+
+  const remainingText = () => {
+    if (goal.isCompleted) return t("targetAchieved");
+    if (locale === "bn") {
+      return `${formatNum(goal.remainingKg)} ${preferredUnit} ${t("remainingToTarget")}`;
+    }
+    return `${goal.remainingFormatted} ${t("remainingToTarget")}`;
   };
 
   return (
@@ -85,10 +97,10 @@ export function GoalProgressCard({
             <p className="text-xs text-slate-500 dark:text-slate-400">
               {goal.isCompleted ? (
                 <span className="text-emerald-500 font-semibold flex items-center gap-1">
-                  <CheckCircle className="w-3.5 h-3.5" /> Target Achieved!
+                  <CheckCircle className="w-3.5 h-3.5" /> {t("targetAchieved")}
                 </span>
               ) : (
-                `${goal.remainingFormatted} remaining to reach target`
+                remainingText()
               )}
             </p>
           </div>
@@ -108,14 +120,14 @@ export function GoalProgressCard({
         <div className="flex justify-between items-baseline mb-2">
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-              {goal.progressPercent}%
+              {formatNum(goal.progressPercent)}%
             </span>
             <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              completed
+              {t("completed")}
             </span>
           </div>
           <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-            {goal.goalType === "lose" ? "Cutting" : goal.goalType === "gain" ? "Bulking" : "Maintaining"}
+            {goal.goalType === "lose" ? t("cutting") : goal.goalType === "gain" ? t("bulking") : t("maintaining")}
           </span>
         </div>
 
@@ -132,16 +144,16 @@ export function GoalProgressCard({
       <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80 text-center">
         <div className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800/40">
           <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500">
-            Starting
+            {t("starting")}
           </div>
           <div className="text-sm font-bold text-slate-800 dark:text-slate-200 mt-0.5">
-            {startingVal} <span className="text-[10px] font-normal text-slate-400">{preferredUnit}</span>
+            {formatNum(startingVal)} <span className="text-[10px] font-normal text-slate-400">{preferredUnit}</span>
           </div>
         </div>
 
         <div className="p-2 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-500/20">
           <div className="text-[10px] uppercase font-bold tracking-wider text-emerald-600 dark:text-emerald-400">
-            Current
+            {t("current")}
           </div>
           <div className="text-sm font-bold text-slate-900 dark:text-white mt-0.5">
             {currentVal} <span className="text-[10px] font-normal text-slate-400">{preferredUnit}</span>
@@ -150,10 +162,10 @@ export function GoalProgressCard({
 
         <div className="p-2 rounded-xl bg-slate-50 dark:bg-slate-800/40">
           <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-center gap-1">
-            <Flag className="w-2.5 h-2.5 text-teal-500" /> Target
+            <Flag className="w-2.5 h-2.5 text-teal-500" /> {t("target")}
           </div>
           <div className="text-sm font-bold text-teal-600 dark:text-teal-400 mt-0.5">
-            {targetVal} <span className="text-[10px] font-normal text-slate-400">{preferredUnit}</span>
+            {formatNum(targetVal)} <span className="text-[10px] font-normal text-slate-400">{preferredUnit}</span>
           </div>
         </div>
       </div>

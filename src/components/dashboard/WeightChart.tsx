@@ -12,6 +12,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import { Calendar, TrendingDown, TrendingUp } from "lucide-react";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 type RangeFilter = "7d" | "30d" | "90d" | "1y" | "all";
 
@@ -32,6 +33,7 @@ export function WeightChart({
   targetWeightKg,
   preferredUnit,
 }: WeightChartProps) {
+  const { t, formatNum } = useLanguage();
   const [range, setRange] = useState<RangeFilter>("30d");
 
   const filteredData = useMemo(() => {
@@ -99,13 +101,21 @@ export function WeightChart({
     return diff;
   }, [filteredData]);
 
+  const filterLabels: Record<RangeFilter, string> = {
+    "7d": t("filter7d"),
+    "30d": t("filter30d"),
+    "90d": t("filter90d"),
+    "1y": t("filter1y"),
+    all: t("filterAll"),
+  };
+
   return (
     <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-6 shadow-sm backdrop-blur-sm transition-all hover:border-emerald-500/30">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <div className="flex items-center gap-2">
             <h3 className="font-semibold text-slate-900 dark:text-slate-100 text-lg">
-              Weight Progression
+              {t("weightProgression")}
             </h3>
             {rangeNetChange !== null && (
               <span
@@ -120,12 +130,12 @@ export function WeightChart({
                 ) : (
                   <TrendingUp className="w-3 h-3" />
                 )}
-                {rangeNetChange > 0 ? `+${rangeNetChange}` : rangeNetChange} {preferredUnit}
+                {rangeNetChange > 0 ? `+${formatNum(rangeNetChange)}` : formatNum(rangeNetChange)} {preferredUnit}
               </span>
             )}
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Visualizing trends with automatic smoothing and target milestone tracking
+            {t("chartSubtitle")}
           </p>
         </div>
 
@@ -141,7 +151,7 @@ export function WeightChart({
                   : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white"
               }`}
             >
-              {tab.toUpperCase()}
+              {filterLabels[tab]}
             </button>
           ))}
         </div>
@@ -151,10 +161,10 @@ export function WeightChart({
         <div className="h-64 flex flex-col items-center justify-center text-center p-6 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
           <Calendar className="w-8 h-8 text-slate-400 mb-2" />
           <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
-            No entries found in this timeframe
+            {t("noEntriesFound")}
           </p>
           <p className="text-xs text-slate-400 mt-1">
-            Log your daily weight to see your progress curve.
+            {t("noEntriesFoundDesc")}
           </p>
         </div>
       ) : (
@@ -195,7 +205,7 @@ export function WeightChart({
                       <div className="bg-slate-900/95 text-white p-3 rounded-xl shadow-xl border border-slate-800 text-xs backdrop-blur-md">
                         <div className="text-slate-400 text-[11px] mb-1">{data.fullDate}</div>
                         <div className="text-base font-bold text-emerald-400">
-                          {data.weight} {preferredUnit}
+                          {formatNum(data.weight)} {preferredUnit}
                         </div>
                         {data.note && (
                           <div className="mt-1.5 pt-1.5 border-t border-slate-800 text-[11px] text-slate-300 max-w-[200px] truncate">
@@ -216,7 +226,7 @@ export function WeightChart({
                   strokeDasharray="4 4"
                   strokeWidth={1.5}
                   label={{
-                    value: `Goal: ${targetWeight} ${preferredUnit}`,
+                    value: `${t("goalLabel")}: ${formatNum(targetWeight)} ${preferredUnit}`,
                     position: "right",
                     fill: "#14b8a6",
                     fontSize: 10,
