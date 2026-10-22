@@ -4,7 +4,9 @@ import { FitnessGoal } from "@/lib/models/FitnessGoal";
 import { connectToDatabase } from "@/lib/mongodb";
 import mongoose from "mongoose";
 
-import { getFallbackGoal, setFallbackGoal } from "@/lib/fallbackStore";
+import { getFallbackGoal } from "@/lib/fallbackStore";
+
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {

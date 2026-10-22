@@ -7,6 +7,8 @@ import { UserProfileUpdateSchema } from "@/lib/validations/schemas";
 import { connectToDatabase } from "@/lib/mongodb";
 import mongoose from "mongoose";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const auth = await verifyAuthUser();

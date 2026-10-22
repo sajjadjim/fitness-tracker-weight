@@ -13,6 +13,8 @@ import {
 import { getFallbackWeights, getFallbackGoal } from "@/lib/fallbackStore";
 import mongoose from "mongoose";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const auth = await verifyAuthUser();

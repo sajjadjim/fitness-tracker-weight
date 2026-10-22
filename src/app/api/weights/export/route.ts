@@ -6,6 +6,8 @@ import { kgToLbs } from "@/lib/calculations";
 import { getFallbackWeights } from "@/lib/fallbackStore";
 import mongoose from "mongoose";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const auth = await verifyAuthUser();
