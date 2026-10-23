@@ -18,6 +18,29 @@ Powered by **Firebase Authentication (Google Sign-In)**, **Firebase Admin SDK** 
 
 ---
 
+## 📸 Application Preview & Screenshots
+
+### 1. 🌟 Landing Page & Interactive Live BMI Gauge
+> Engaging hero experience with instant WHO BMI screening calculator, Bengali/English language switcher, dark/light mode toggle, and one-click guest demo access.
+
+![FitTrack Landing Page](images/image1.png)
+
+<br />
+
+### 2. 📊 Personal Fitness Dashboard & Health Metrics
+> Authoritative health telemetry featuring dual-unit display (**KG** and **LBS** simultaneously), color-coded WHO standard BMI gauge bar, healthy adult reference weight range, and adaptive goal progress tracker.
+
+![FitTrack Dashboard Overview](images/image2.png)
+
+<br />
+
+### 3. 📈 Multi-Span Progress Charts & Analytics
+> Dynamic weight progression visualization built with Recharts, supporting 7-day, 30-day, 90-day, 1-year, and all-time interactive spans with target milestone reference line and log history table.
+
+![FitTrack Progress Chart & Analytics](images/image3.png)
+
+---
+
 ## 🚀 Core Features
 
 1. **Public Landing Page**: Premium presentation with live interactive BMI slider calculator, features overview, and Google Sign-In.
@@ -62,6 +85,10 @@ Powered by **Firebase Authentication (Google Sign-In)**, **Firebase Admin SDK** 
 
 ```
 fitness-tracker-weight/
+├── images/
+│   ├── image1.png                         # Landing page & interactive BMI gauge
+│   ├── image2.png                         # Health dashboard, BMI bar & goal cards
+│   └── image3.png                         # Recharts progression analytics & history
 ├── src/
 │   ├── app/
 │   │   ├── api/
